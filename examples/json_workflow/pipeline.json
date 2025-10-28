@@ -1,0 +1,317 @@
+{
+  "version": "1.0",
+  "metadata": {
+    "name": "Data Processing Pipeline",
+    "description": "Example pipeline demonstrating node composition from JSON",
+    "author": "PipeDag Example"
+  },
+  "nodes": [
+    {
+      "id": "source1",
+      "type": "range_source",
+      "config": {
+        "start": 1,
+        "end": 11,
+        "step": 1
+      }
+    },
+    {
+      "id": "filter_even",
+      "type": "filter_list",
+      "config": {
+        "condition": "even"
+      }
+    },
+    {
+      "id": "filter_odd",
+      "type": "filter_list",
+      "config": {
+        "condition": "odd"
+      }
+    },
+    {
+      "id": "transform_even",
+      "type": "map_transform",
+      "config": {
+        "operation": "square"
+      }
+    },
+    {
+      "id": "transform_odd",
+      "type": "map_transform",
+      "config": {
+        "operation": "double"
+      }
+    },
+    {
+      "id": "sum_even",
+      "type": "sum_list",
+      "config": {}
+    },
+    {
+      "id": "sum_odd",
+      "type": "sum_list",
+      "config": {}
+    },
+    {
+      "id": "add_totals",
+      "type": "add",
+      "config": {}
+    },
+    {
+      "id": "multiply_result",
+      "type": "multiply",
+      "config": {}
+    },
+    {
+      "id": "constant_multiplier",
+      "type": "constant_source",
+      "config": {
+        "value": 2
+      }
+    },
+    {
+      "id": "timestamp",
+      "type": "timestamp_source",
+      "config": {}
+    },
+    {
+      "id": "format_message",
+      "type": "format_string",
+      "config": {}
+    },
+    {
+      "id": "template",
+      "type": "constant_source",
+      "config": {
+        "value": "Final result computed at {value}: "
+      }
+    },
+    {
+      "id": "log_timestamp",
+      "type": "logger",
+      "config": {
+        "level": "info",
+        "prefix": "[TIMESTAMP] "
+      }
+    },
+    {
+      "id": "async_process",
+      "type": "async_delay",
+      "config": {
+        "delay_ms": 50
+      }
+    },
+    {
+      "id": "aggregate_stats",
+      "type": "aggregate",
+      "config": {}
+    },
+    {
+      "id": "final_results",
+      "type": "collect_results",
+      "config": {}
+    },
+    {
+      "id": "log_results",
+      "type": "logger",
+      "config": {
+        "level": "info",
+        "prefix": "[RESULTS] "
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": {
+        "node": "source1",
+        "output": "numbers"
+      },
+      "target": {
+        "node": "filter_even",
+        "input": "items"
+      }
+    },
+    {
+      "source": {
+        "node": "source1",
+        "output": "numbers"
+      },
+      "target": {
+        "node": "filter_odd",
+        "input": "items"
+      }
+    },
+    {
+      "source": {
+        "node": "filter_even",
+        "output": "filtered"
+      },
+      "target": {
+        "node": "transform_even",
+        "input": "items"
+      }
+    },
+    {
+      "source": {
+        "node": "filter_odd",
+        "output": "filtered"
+      },
+      "target": {
+        "node": "transform_odd",
+        "input": "items"
+      }
+    },
+    {
+      "source": {
+        "node": "transform_even",
+        "output": "transformed"
+      },
+      "target": {
+        "node": "sum_even",
+        "input": "numbers"
+      }
+    },
+    {
+      "source": {
+        "node": "transform_odd",
+        "output": "transformed"
+      },
+      "target": {
+        "node": "sum_odd",
+        "input": "numbers"
+      }
+    },
+    {
+      "source": {
+        "node": "sum_even",
+        "output": "sum"
+      },
+      "target": {
+        "node": "add_totals",
+        "input": "x"
+      }
+    },
+    {
+      "source": {
+        "node": "sum_odd",
+        "output": "sum"
+      },
+      "target": {
+        "node": "add_totals",
+        "input": "y"
+      }
+    },
+    {
+      "source": {
+        "node": "add_totals",
+        "output": "result"
+      },
+      "target": {
+        "node": "multiply_result",
+        "input": "x"
+      }
+    },
+    {
+      "source": {
+        "node": "constant_multiplier",
+        "output": "value"
+      },
+      "target": {
+        "node": "multiply_result",
+        "input": "y"
+      }
+    },
+    {
+      "source": {
+        "node": "timestamp",
+        "output": "timestamp"
+      },
+      "target": {
+        "node": "format_message",
+        "input": "value"
+      }
+    },
+    {
+      "source": {
+        "node": "template",
+        "output": "value"
+      },
+      "target": {
+        "node": "format_message",
+        "input": "template"
+      }
+    },
+    {
+      "source": {
+        "node": "format_message",
+        "output": "formatted"
+      },
+      "target": {
+        "node": "log_timestamp",
+        "input": "message"
+      }
+    },
+    {
+      "source": {
+        "node": "multiply_result",
+        "output": "result"
+      },
+      "target": {
+        "node": "async_process",
+        "input": "value"
+      }
+    },
+    {
+      "source": {
+        "node": "async_process",
+        "output": "value"
+      },
+      "target": {
+        "node": "aggregate_stats",
+        "input": "input1"
+      }
+    },
+    {
+      "source": {
+        "node": "sum_even",
+        "output": "average"
+      },
+      "target": {
+        "node": "aggregate_stats",
+        "input": "input2"
+      }
+    },
+    {
+      "source": {
+        "node": "sum_odd",
+        "output": "count"
+      },
+      "target": {
+        "node": "aggregate_stats",
+        "input": "input3"
+      }
+    },
+    {
+      "source": {
+        "node": "aggregate_stats",
+        "output": "combined"
+      },
+      "target": {
+        "node": "final_results",
+        "input": "data"
+      }
+    },
+    {
+      "source": {
+        "node": "final_results",
+        "output": "summary"
+      },
+      "target": {
+        "node": "log_results",
+        "input": "message"
+      }
+    }
+  ]
+}
+
