@@ -37,6 +37,8 @@ This installs the package in editable mode with all development dependencies.
 
 ### Running Tests
 
+**Note**: Tests require `pytest-asyncio` to be installed (included in `[dev]` dependencies).
+
 ```bash
 # Run all tests
 pytest

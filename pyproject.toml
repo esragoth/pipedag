@@ -22,6 +22,10 @@ classifiers = [
 
 [project.optional-dependencies]
 schemas = ["pydantic>=2.0"]
+test = [
+    "pytest>=7.4",
+    "pytest-asyncio>=0.21",
+]
 dev = [
     "pytest>=7.4",
     "pytest-asyncio>=0.21",
@@ -37,7 +41,6 @@ where = ["."]
 include = ["pipedag*"]
 
 [tool.pytest.ini_options]
-asyncio_mode = "auto"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
@@ -47,6 +50,7 @@ addopts = [
     "--tb=short",
     "-v",
 ]
+asyncio_mode = "auto"
 
 [tool.coverage.run]
 source = ["pipedag"]
